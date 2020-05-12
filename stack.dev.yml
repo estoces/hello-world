@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+    event_service_daemon:
+        image: dockerregistry.azurecr.io/event_service_daemon:dev
+        env_file:
+            - ./docker.env
+            - ./docker.env.dev
+        credential_spec:
+            file: gmsa_eventsvc_d.json
+        logging:
+            options:
+                max-size: "10m"
+                max-file: "7"
+        deploy:
+            replicas: 2      
+            restart_policy:
+                condition: on-failure
+                delay: 2s
+                max_attempts: 5
+                window: 10s
+            placement:
+                constraints:
+                    -  node.role==worker
+        healthcheck:
+            test: ["CMD", "powershell", "./healthcheck.ps1"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 45s
+    smtp4dev:
+        image: dockerregistry.azurecr.io/smtp4dev:latest
+        ports:
+        - "25:25"
+        - "3000:80"
+        deploy:
+            replicas: 1      
+            restart_policy:
+                condition: on-failure
+                max_attempts: 5
+            placement:
+                constraints:
+                    -  node.role==worker
