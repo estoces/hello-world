@@ -1,3 +1,3 @@
 # hello-world
 
-This is estoces first comments on the hello-world readme.
+This is estoces first comment on the hello-world readme.
